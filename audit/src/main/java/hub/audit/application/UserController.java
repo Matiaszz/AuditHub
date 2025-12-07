@@ -2,8 +2,11 @@ package hub.audit.application;
 
 import hub.audit.domain.user.User;
 import hub.audit.domain.user.UserService;
+import hub.audit.interfaces.dtos.requests.LoginDTO;
 import hub.audit.interfaces.dtos.requests.UserRequestDTO;
 import hub.audit.interfaces.dtos.responses.UserResponseDTO;
+import jakarta.validation.Valid;
+import org.hibernate.usertype.UserVersionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,9 +22,16 @@ public class UserController {
     private UserService service;
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponseDTO> createUser(@RequestBody UserRequestDTO data){
+    public ResponseEntity<UserResponseDTO> createUser(@RequestBody @Valid UserRequestDTO data){
         User user = service.saveUserFromDTO(data);
         UserResponseDTO response = new UserResponseDTO(user);
         return ResponseEntity.status(201).body(response);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDTO> login(@RequestBody @Valid LoginDTO data) {
+        User user = service.login(data);
+        UserResponseDTO response = new UserResponseDTO(user);
+        return ResponseEntity.ok(response);
     }
 }

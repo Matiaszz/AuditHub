@@ -1,9 +1,13 @@
 package hub.audit.domain.user;
 
 import hub.audit.interfaces.ValueObjects.FindBy;
+import hub.audit.interfaces.dtos.requests.LoginDTO;
 import hub.audit.interfaces.dtos.requests.UserRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -19,6 +23,11 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+
+    @Cacheable(value = "userByEmail", key = "#key", condition = "#findBy.name() == 'EMAIL'")
     public User getUser(String key, FindBy findBy){
         if (key == null || key.isEmpty()){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -31,7 +40,6 @@ public class UserService {
         }
 
         return switch (findBy) {
-
             case ID -> {
                 UUID id;
 
@@ -98,5 +106,16 @@ public class UserService {
             default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role");
         }
         return userRole;
+    }
+
+    public User login(LoginDTO data){
+        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.password());
+        var auth = this.authenticationManager.authenticate(usernamePassword);
+
+        if (!auth.isAuthenticated()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid credentials.");
+        }
+
+        return (User) auth.getPrincipal();
     }
 }
