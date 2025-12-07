@@ -3,7 +3,6 @@ package hub.audit.interfaces.dtos.responses;
 import hub.audit.domain.user.User;
 import hub.audit.domain.user.UserRole;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
