@@ -1,0 +1,63 @@
+@use '../../../../variables.scss' as *;
+
+#defaultBtn {
+    /* Layout e Dimensões */
+    display: inline-flex; /* Usar flexbox para melhor alinhamento interno se houver ícones */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 10px 24px; /* Ajuste sutil no padding */
+    border-radius: 25px; /* Bordas mais arredondadas (pill-shaped) para um visual moderno */
+
+    /* Estilo Base */
+    background: linear-gradient(135deg, $primary-accent, $ligth-blue); /* Fundo com gradiente suave */
+    color: $ligth-card; /* Texto branco/claro */
+    border: 2px solid $ligth-blue; /* Borda sutil para profundidade */
+    outline: none;
+    
+    /* Tipografia */
+    font-size: 16px; /* Tamanho da fonte levemente maior */
+    font-weight: 700; /* Negrito mais forte */
+    letter-spacing: 0.8px; /* Espaçamento de letras levemente maior */
+    text-transform: uppercase; /* Deixa o texto em maiúsculas */
+    
+    /* Interatividade e Efeitos */
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba($primary-accent, 0.4); /* Sombra mais colorida e suave */
+    transition: 
+        all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), 
+        box-shadow 0.3s ease-in-out; /* Transição mais suave e complexa */
+}
+
+/* Efeitos de Interação */
+#defaultBtn:hover {
+    background: linear-gradient(135deg, $ligth-blue, $primary-accent); /* Gradiente reverso no hover */
+    transform: translateY(-3px); /* Efeito de elevação maior */
+    box-shadow: 0 10px 25px rgba($primary-accent, 0.6); /* Sombra mais intensa */
+    border-color: $primary-accent; /* Mudar a cor da borda no hover */
+}
+
+#defaultBtn:active {
+    transform: translateY(0); /* Retorna à posição original */
+    background: $primary-accent; /* Cor sólida no clique */
+    box-shadow: 0 2px 8px rgba($primary-accent, 0.2); /* Sombra sutil de clique */
+    transition: all 0.1s ease; /* Transição de clique mais rápida */
+}
+
+#defaultBtn:disabled {
+    opacity: 0.7;
+    background: $light-gray; /* Fundo cinza para desabilitado */
+    color: $gray; /* Texto mais escuro */
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    border-color: $light-gray;
+}
+
+/* Sugestão Adicional: Adicionar um pequeno ícone com um span */
+/* Se você usar um ícone, ajuste o espaçamento assim: */
+/*
+#defaultBtn span {
+    margin-right: 8px;
+}
+*/

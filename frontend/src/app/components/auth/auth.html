@@ -1,0 +1,40 @@
+<div class="auth-container">
+    <div class="info-container">
+        <div>
+            <h1>Welcome to AuditHub!</h1>
+            <p>Access your dashboard and manage your workflow.</p>
+        </div>
+    </div>
+
+    <div class="form-container">
+        <div class="form-wrapper">
+            <form action="" method="post">
+                <h2>{{formType !    == 'register' ? 'Signin' : 'Signup'}}</h2>
+                @if (formType === 'register') {
+                    <label>First Name</label>
+                    <input [(ngModel)]="form.firstName" type="text" name="firstName" placeholder="First Name">
+
+                    <label>Last Name</label>
+                    <input [(ngModel)]="form.lastName" type="text" name="lastName" placeholder="Last Name">
+                }
+                
+                <label>Email</label>
+                <input [(ngModel)]="form.email" type="email" name="email" placeholder="Enter your email">
+
+                <label>Password</label>
+                <input [(ngModel)]="form.password" type="password" name="password" placeholder="Create a password">
+
+                <default-button
+                    [content]="formType === 'register' ? 'Signup' : 'Signin'"
+                    (onAction)="onSubmit()">
+                </default-button>
+            </form>
+            <default-button
+                [content]="formType !== 'register'
+                    ? 'I don’t have an account.'
+                    : 'I already have an account.'"
+                (onAction)="switchFormType()">
+            </default-button>
+        </div>
+    </div>
+</div>
