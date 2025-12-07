@@ -1,0 +1,99 @@
+@use '../../../variables.scss' as *;
+
+
+.auth-container {
+    display: flex;
+    width: 100vw;
+    height: 100vh;
+
+    .info-container,
+    .form-container {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .info-container {
+        background: linear-gradient(135deg, $primary, $primary-accent);
+        color: $dark-text;
+
+        h1 {
+            font-size: 4rem;
+        }
+
+        p {
+            font-size: 2rem;
+        }
+    }
+
+    .form-container {
+        background: $light-bg;
+
+        .form-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+
+            h2 { 
+                font-size: 3rem;
+            }
+
+            input {
+                padding: 1rem 1.4rem;
+                border-radius: 6px;
+                border: 1px solid $snow-gray;
+                width: 40rem;
+            }
+
+            label {
+                font-size: 1.5rem;
+            }
+            
+        }
+        
+    }
+
+    @media (max-width: 900px) {
+        flex-direction: column;
+
+        .info-container,
+        .form-container {
+            width: 100%;
+        }
+
+        .info-container {
+            min-height: 40vh;
+            h1 { font-size: 3rem; }
+            p { font-size: 1.6rem; }
+        }
+
+        .form-container {
+            min-height: 60vh;
+        }
+    }
+
+    /* ------------ 📌 Breakpoint 600px ------------ */
+    @media (max-width: 600px) {
+        .info-container {
+            min-height: 35vh;
+            h1 { font-size: 2.5rem; }
+            p { font-size: 1.4rem; }
+        }
+
+        .form-container form h2 {
+            font-size: 2rem;
+        }
+
+        .form-container form input {
+            width: 90%;
+            height: 0;
+        }
+    }
+}
