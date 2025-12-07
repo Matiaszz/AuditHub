@@ -2,16 +2,20 @@ package hub.audit.domain.user;
 
 import hub.audit.interfaces.ValueObjects.FindBy;
 import hub.audit.interfaces.dtos.requests.LoginDTO;
+import hub.audit.interfaces.dtos.requests.SetAdminDTO;
 import hub.audit.interfaces.dtos.requests.UserRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -78,34 +82,22 @@ public class UserService {
         }
 
         String password = passwordEncoder.encode(dto.password().trim());
-        UserRole userRole = getUserRoleFromDTO(dto);
 
-        User user = new User(dto,password, userRole);
+        User user = new User(dto,password, UserRole.COMMON);
         return repository.save(user);
     }
 
+    public User saveAdminFromDTO(SetAdminDTO dto){
+        adminCheck();
+        String formattedEmail = dto.email().trim().toLowerCase();
+        User userExist = repository.findByEmail(formattedEmail).orElse(null);
 
-
-    private UserRole getUserRoleFromDTO(UserRequestDTO dto) {
-        if (dto.role() == null || dto.role().isEmpty()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Role is null");
+        if (userExist == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Email doesn't exist");
         }
 
-        String role = dto.role().trim().toUpperCase();
-
-        if (role.startsWith("ROLE_")){
-            role = role.substring(5);
-        }
-
-        UserRole userRole;
-        switch (role){
-            case "ADMIN" -> userRole = UserRole.ADMIN;
-            case "DEVOPS" -> userRole = UserRole.DEVOPS;
-            case "DEV" -> userRole = UserRole.DEV;
-            case "AUDITOR" -> userRole = UserRole.AUDITOR;
-            default -> throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role");
-        }
-        return userRole;
+        userExist.setRole(UserRole.ADMIN);
+        return repository.save(userExist);
     }
 
     public User login(LoginDTO data){
@@ -117,5 +109,22 @@ public class UserService {
         }
 
         return (User) auth.getPrincipal();
+    }
+
+    public User getCurrentUser() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated() || Objects.equals(auth.getPrincipal(), "anonymousUser")) {
+            return null;
+        }
+
+        return (User) auth.getPrincipal();
+    }
+
+    public void adminCheck(){
+        User loggedUser = getCurrentUser();
+        if (!loggedUser.isAdmin()){
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You aren't authorized to do this action.");
+        }
     }
 }
