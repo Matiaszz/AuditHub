@@ -14,9 +14,6 @@ public record UserRequestDTO(
 
         @NotNull
         @Size(max = 6)
-        String password,
-
-        @NotNull
-        String role
+        String password
 ) {
 }

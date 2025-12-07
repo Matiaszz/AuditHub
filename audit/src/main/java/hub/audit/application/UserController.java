@@ -6,7 +6,6 @@ import hub.audit.interfaces.dtos.requests.LoginDTO;
 import hub.audit.interfaces.dtos.requests.UserRequestDTO;
 import hub.audit.interfaces.dtos.responses.UserResponseDTO;
 import jakarta.validation.Valid;
-import org.hibernate.usertype.UserVersionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

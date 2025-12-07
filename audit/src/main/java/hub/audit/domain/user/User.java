@@ -82,4 +82,8 @@ public class User implements UserDetails {
         this.password = password;
         this.role = role;
     }
+
+    public boolean isAdmin(){
+        return this.role.equals(UserRole.ADMIN);
+    }
 }
