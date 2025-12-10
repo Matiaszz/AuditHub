@@ -114,8 +114,6 @@ public class UserService {
             auth = this.authenticationManager.authenticate(usernamePassword);
         } catch(BadCredentialsException e){
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Credenciais invalidas");
-        } catch (Exception e){
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 
         System.out.println("Chegou no authenticate");

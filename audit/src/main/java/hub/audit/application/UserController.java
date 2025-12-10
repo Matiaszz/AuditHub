@@ -51,9 +51,9 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserResponseDTO> getMe(){
         User user = service.getCurrentUser();
-        return ResponseEntity.ok(
-                new UserResponseDTO(user));
 
+        return user != null ? ResponseEntity.ok(
+                new UserResponseDTO(user)) : ResponseEntity.ok().build();
     }
 
     @PostMapping("/logout")
