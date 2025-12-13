@@ -1,0 +1,58 @@
+@use '../../../../variables.scss' as *;
+
+.toast-container {
+    width: 22rem;              // 200px
+    padding: 1rem 1.2rem;      // compacto
+    color: #fff;
+    border-radius: 1rem;
+    font-size: 1.6rem;         
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+
+    animation: fadeIn .28s ease-out;
+
+    position: fixed;
+    top: 1.8rem;
+    right: 1.8rem;
+
+    box-shadow: 0 0.6rem 1.4rem rgba(0, 0, 0, 0.22);
+}
+
+.success { background-color: $success; }
+.info    { background-color: $info; }
+.warn    { background-color: $warning; }
+.error   { background-color: $critical; }
+
+.toast-header {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.toast-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.2rem;          // 22px
+    height: 2.2rem;
+
+    border-radius: 0.5rem;
+    background: rgba(0, 0, 0, 0.18);
+
+    font-size: 1.6rem;      // ícone menor
+    font-weight: bold;
+}
+
+.toast-header h6 {
+    font-size: 1.6rem;      // 16px
+    font-weight: 600;
+}
+
+.toast-content {
+    font-size: 1.3rem;      // 13px
+    line-height: 1.35;
+    opacity: 0.95;
+}

@@ -8,3 +8,21 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface ToastParams {
+  title: string;
+  content: string;
+  type: ToastTypes;
+}
+
+export enum ToastTypes {
+  SUCCESS = 'success',
+  ERROR = 'error',
+  INFO = 'info',
+  WARN = 'warn',
+}
+
+export enum FormType {
+  REGISTER = 'register',
+  LOGIN = 'login',
+}
