@@ -1,23 +1,30 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Button } from '../ui/button/button';
 import { AuthService } from '../../services/auth-service';
-import { User } from '../../../@types/types';
+import { FormType, ToastParams, ToastTypes, User } from '../../../@types/types';
 import { Router } from '@angular/router';
+import { Toast } from '../ui/toast/toast';
+import { Utils } from '../../services/utils';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, Button],
+  imports: [FormsModule, Button, Toast],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })
 export class Auth {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private ngZone: NgZone,
+    private utils: Utils
+  ) {}
 
   user: User | null = null;
-  notifyToDoLogin: boolean = false;
+  showToast: boolean = false;
 
-  formType: 'login' | 'register' = 'register';
+  formType: FormType = FormType.REGISTER;
   defaultFormValue: AuthForm = {
     firstName: '',
     lastName: '',
@@ -27,48 +34,68 @@ export class Auth {
 
   form: AuthForm = this.defaultFormValue;
 
+  toastParams: ToastParams = {
+    title: '',
+    content: '',
+    type: ToastTypes.INFO,
+  };
+
   switchFormType() {
-    this.formType = this.formType === 'register' ? 'login' : 'register';
+    this.formType = this.formType === FormType.REGISTER ? FormType.LOGIN : FormType.LOGIN;
     this.form = this.defaultFormValue;
   }
 
+  showToastMessage(params: ToastParams) {
+    this.ngZone.run(() => {
+      this.toastParams = params;
+      this.showToast = true;
+
+      setTimeout(() => {
+        this.showToast = false;
+      }, 5000);
+    });
+  }
+
   onSubmit() {
-    console.log(this.form, this.formType);
+    const hasErrors = this.utils.validateAuth(this.formType, this.form);
+    if (hasErrors) {
+      return this.showToastMessage(hasErrors);
+    }
     this.authService.postAuth(this.form, this.formType).subscribe({
       next: (res) => {
-        console.log(res);
         if (res.status === 204) {
           this.authService.loadUser();
           this.router.navigate(['/painel']);
-          // TODO: First Success Message
           return;
         }
-
+      },
+      error: (res) => {
         if (res.status === 403) {
-          // TODO: Bad credentials message
+          this.showToastMessage({
+            title: 'Error during login',
+            type: ToastTypes.ERROR,
+            content: 'Invalid credentials.',
+          });
           return;
         }
 
         if (res.status === 409) {
-          // TODO: Account already exist message
+          this.showToastMessage({
+            title: 'Error during registering',
+            type: ToastTypes.ERROR,
+            content: 'This email already have an account.',
+          });
           return;
         }
-        this.tempNotification();
-      },
-      error(err) {
-        console.error('Error during auth request: ', err, err.status);
+
+        this.showToastMessage({
+          title: 'Unexpected error',
+          type: ToastTypes.ERROR,
+          content: 'Something went wrong.',
+        });
+
+        console.error('Error during auth request: ', res, res.status);
       },
     });
-  }
-
-  tempNotification() {
-    this.notifyToDoLogin = true;
-    console.warn('notification is active');
-
-    setTimeout(() => {
-      this.notifyToDoLogin = false;
-    }, 3500);
-
-    console.warn('notification is inactive');
   }
 }

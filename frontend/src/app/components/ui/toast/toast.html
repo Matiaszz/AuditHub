@@ -1,1 +1,23 @@
-<p>toast works!</p>
+
+<div class="toast-container {{toastType}}" >
+    <div class="toast-header">
+        <span class="toast-icon">
+            @switch (toastType) {
+                @case ('success') {
+                    V
+                } @case ('warn') {
+                    Y
+                } @case ('info') {
+                    i
+                } @case('error'){
+                    X
+                }
+            }
+        </span>
+        <h6>{{title}}</h6>
+    </div>
+    <div class="toast-content">
+        <p>{{content}}</p>
+    </div>
+</div>
+
