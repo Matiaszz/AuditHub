@@ -1,15 +1,19 @@
-import { Component, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Button } from '../ui/button/button';
-import { AuthService } from '../../services/auth-service';
-import { FormType, ToastParams, ToastTypes, User } from '../../../@types/types';
 import { Router } from '@angular/router';
-import { Toast } from '../ui/toast/toast';
+
+import { Button } from '../ui/button/button';
+
+import { AuthService } from '../../services/auth-service';
 import { Utils } from '../../services/utils';
+import { ToastService } from '../../services/toast-service';
+
+import { FormType, ToastTypes, User } from '../../../@types/types';
 
 @Component({
   selector: 'app-auth',
-  imports: [FormsModule, Button, Toast],
+  standalone: true,
+  imports: [FormsModule, Button],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })
@@ -17,85 +21,73 @@ export class Auth {
   constructor(
     private authService: AuthService,
     private router: Router,
-    private ngZone: NgZone,
-    private utils: Utils
+    private utils: Utils,
+    private toastService: ToastService
   ) {}
 
   user: User | null = null;
-  showToast: boolean = false;
 
   formType: FormType = FormType.REGISTER;
-  defaultFormValue: AuthForm = {
+
+  readonly defaultFormValue: AuthForm = {
     firstName: '',
     lastName: '',
     email: '',
     password: '',
   };
 
-  form: AuthForm = this.defaultFormValue;
-
-  toastParams: ToastParams = {
-    title: '',
-    content: '',
-    type: ToastTypes.INFO,
-  };
+  form: AuthForm = { ...this.defaultFormValue };
 
   switchFormType() {
-    this.formType = this.formType === FormType.REGISTER ? FormType.LOGIN : FormType.LOGIN;
-    this.form = this.defaultFormValue;
-  }
+    this.formType = this.formType === FormType.REGISTER ? FormType.LOGIN : FormType.REGISTER;
 
-  showToastMessage(params: ToastParams) {
-    this.ngZone.run(() => {
-      this.toastParams = params;
-      this.showToast = true;
-
-      setTimeout(() => {
-        this.showToast = false;
-      }, 5000);
-    });
+    this.form = { ...this.defaultFormValue };
   }
 
   onSubmit() {
-    const hasErrors = this.utils.validateAuth(this.formType, this.form);
-    if (hasErrors) {
-      return this.showToastMessage(hasErrors);
+    const error = this.utils.validateAuth(this.formType, this.form);
+
+    if (error) {
+      this.toastService.show(error);
+      return;
     }
+
     this.authService.postAuth(this.form, this.formType).subscribe({
       next: (res) => {
         if (res.status === 204) {
           this.authService.loadUser();
           this.router.navigate(['/painel']);
-          return;
         }
       },
-      error: (res) => {
-        if (res.status === 403) {
-          this.showToastMessage({
-            title: 'Error during login',
-            type: ToastTypes.ERROR,
-            content: 'Invalid credentials.',
-          });
-          return;
-        }
-
-        if (res.status === 409) {
-          this.showToastMessage({
-            title: 'Error during registering',
-            type: ToastTypes.ERROR,
-            content: 'This email already have an account.',
-          });
-          return;
-        }
-
-        this.showToastMessage({
-          title: 'Unexpected error',
-          type: ToastTypes.ERROR,
-          content: 'Something went wrong.',
-        });
-
-        console.error('Error during auth request: ', res, res.status);
-      },
+      error: (res) => this.handleAuthError(res),
     });
+  }
+
+  private handleAuthError(res: any) {
+    if (res.status === 403) {
+      this.toastService.show({
+        title: 'Error during login',
+        type: ToastTypes.ERROR,
+        content: 'Invalid credentials.',
+      });
+      return;
+    }
+
+    if (res.status === 409) {
+      this.toastService.show({
+        title: 'Error during registering',
+        type: ToastTypes.ERROR,
+        content: 'This email already has an account.',
+      });
+      return;
+    }
+
+    this.toastService.show({
+      title: 'Unexpected error',
+      type: ToastTypes.ERROR,
+      content: 'Something went wrong.',
+    });
+
+    console.error('Error during auth request:', res);
   }
 }

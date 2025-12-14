@@ -6,10 +6,10 @@ import { User } from '../../../@types/types';
 @Component({
   selector: 'app-painel',
   imports: [],
-  templateUrl: './painel.html',
-  styleUrl: './painel.scss',
+  templateUrl: './dashboard.html',
+  styleUrl: './dashboard.scss',
 })
-export class Painel implements OnInit {
+export class Dashboard implements OnInit {
   constructor(private authService: AuthService, private router: Router) {}
   user: User | null = null;
   ngOnInit(): void {

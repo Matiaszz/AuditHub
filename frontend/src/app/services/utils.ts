@@ -6,52 +6,44 @@ import { FormType, ToastParams, ToastTypes } from '../../@types/types';
 })
 export class Utils {
   validateAuth(formType: FormType, form: AuthForm): ToastParams | null {
-    const errorTitle = formType === 'register' ? 'Error during register' : 'Error during login';
+    const errorTitle =
+      formType === FormType.REGISTER ? 'Error during register' : 'Error during login';
 
-    if (formType === 'register') {
+    if (formType === FormType.REGISTER) {
       if (!form.firstName?.trim()) {
-        return {
-          title: errorTitle,
-          type: ToastTypes.WARN,
-          content: 'Please, fill "first name" field.',
-        };
+        return this.warn(errorTitle, 'Please, fill "first name" field.');
       }
 
       if (!form.lastName?.trim()) {
-        return {
-          title: errorTitle,
-          type: ToastTypes.WARN,
-          content: 'Please, fill "last name" field.',
-        };
+        return this.warn(errorTitle, 'Please, fill "last name" field.');
       }
     }
 
     if (!form.email?.trim()) {
-      return {
-        title: errorTitle,
-        type: ToastTypes.WARN,
-        content: 'Please, fill "email" field.',
-      };
+      return this.warn(errorTitle, 'Please, fill "email" field.');
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    if (!emailRegex.test(form.email)) {
-      return {
-        title: errorTitle,
-        type: ToastTypes.WARN,
-        content: 'Please, enter a valid email address.',
-      };
+    if (!this.isValidEmail(form.email)) {
+      return this.warn(errorTitle, 'Please, enter a valid email address.');
     }
 
     if (!form.password?.trim()) {
-      return {
-        title: errorTitle,
-        type: ToastTypes.WARN,
-        content: 'Please, fill "password" field.',
-      };
+      return this.warn(errorTitle, 'Please, fill "password" field.');
     }
 
     return null;
+  }
+
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  }
+
+  private warn(title: string, content: string): ToastParams {
+    return {
+      title,
+      content,
+      type: ToastTypes.WARN,
+    };
   }
 }
